@@ -2,392 +2,260 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello di Controllo dell'Economia</title>
+    <title>Sovereign Lab: Pro Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --text-main: #f8fafc;
-            --accent-blue: #38bdf8;
-            --accent-green: #4ade80;
-            --accent-red: #f87171;
-            --accent-yellow: #facc15;
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap');
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        
+        .slider { @apply w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer outline-none transition-all; }
+        .slider::-webkit-slider-thumb { @apply appearance-none w-4 h-4 rounded-full bg-indigo-500 hover:bg-indigo-400 cursor-pointer; }
+        
+        .panel { @apply bg-[#0f172a] border border-slate-800/80 rounded-xl p-5 shadow-2xl; }
+        
+        /* I box delle equazioni ad altissimo contrasto come richiesto */
+        .code-input { 
+            @apply w-full border border-slate-700 rounded-md p-3 text-[12px] font-mono transition-all outline-none;
+            background-color: #000000; 
+            color: #ffffff; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-        }
-
-        header p {
-            color: #94a3b8;
-            font-size: 1.1rem;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 1400px;
-        }
-
-        /* Pannello Controlli */
-        .controls {
-            background-color: var(--panel-bg);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .controls h2 {
-            margin-top: 0;
-            font-size: 1.5rem;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 10px;
-        }
-
-        .slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .slider-group label {
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .slider-group span {
-            color: var(--accent-blue);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-            accent-color: var(--accent-blue);
-        }
-
-        /* Toggle Button Regolarizzazione */
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #334155;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .toggle-group label {
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            accent-color: var(--accent-green);
-        }
-
-        /* Alert System */
-        .alerts-container {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7); }
-            50% { transform: scale(1.02); box-shadow: 0 0 10px 5px rgba(248, 113, 113, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
-        }
-
-        .alert.active {
-            display: flex;
-        }
-
-        .alert-fuga { background: rgba(248, 113, 113, 0.2); border: 2px solid var(--accent-red); color: var(--accent-red); }
-        .alert-poverta { background: rgba(250, 204, 21, 0.2); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); }
-        .alert-inflazione { background: rgba(248, 113, 113, 0.2); border: 2px solid var(--accent-red); color: var(--accent-red); }
-        .alert-debito { background: rgba(248, 113, 113, 0.2); border: 2px solid var(--accent-red); color: var(--accent-red); }
-
-        /* Area Principale (Grafico e Stats) */
-        .main-area {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .chart-container {
-            background-color: var(--panel-bg);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            height: 500px;
-        }
-
-        /* Status Cards */
-        .status-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .card {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #334155;
-            text-align: center;
-        }
-
-        .card h3 { margin: 0 0 10px 0; color: #94a3b8; }
-        .card .value { font-size: 2rem; font-weight: bold; color: var(--text-main); }
-        .card .icon { font-size: 2.5rem; margin-bottom: 10px; }
-
+        .code-input:focus { @apply border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]; }
+        .code-input.error { @apply border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]; }
+        
+        .badge { @apply px-2 py-1 bg-slate-800 text-slate-300 rounded text-[10px] font-mono border border-slate-700; }
+        .step-num { @apply inline-flex items-center justify-center w-5 h-5 rounded bg-slate-800 text-[10px] font-black mr-2 border border-slate-700; }
     </style>
 </head>
-<body>
+<body class="p-4 lg:p-6 min-h-screen flex flex-col">
 
-    <header>
-        <h1>Pannello di Controllo dell'Economia</h1>
-        <p>Simulatore Macroeconomico - Sei alla guida del Paese</p>
+    <!-- HEADER -->
+    <header class="mb-6 flex justify-between items-end border-b border-slate-800 pb-4">
+        <div>
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 tracking-tight">SOVEREIGN LAB</h1>
+            <p class="text-xs text-slate-500 font-mono mt-1">v3.0 // Dynamic Equation Context Engine</p>
+        </div>
+        <div id="status-led" class="text-xs font-mono font-bold px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> SYSTEM ONLINE
+        </div>
     </header>
 
-    <div class="dashboard">
-        <!-- BARRA LATERALE CONTROLLI -->
-        <div class="controls">
-            <h2>Ministero dell'Economia</h2>
-
-            <div class="slider-group">
-                <label>Scala Mobile (Lavoro) <span id="sm-val">0</span></label>
-                <input type="range" id="sm" min="0" max="1" step="0.1" value="0" oninput="updateSim()">
-            </div>
-
-            <div class="slider-group">
-                <label>Tassazione Extra (Fisco) <span id="te-val">5%</span></label>
-                <input type="range" id="te" min="0" max="0.5" step="0.01" value="0.05" oninput="updateSim()">
-            </div>
-
-            <div class="slider-group">
-                <label>Flusso Migratorio (Demo) <span id="fm-val">0.4</span></label>
-                <input type="range" id="fm" min="0" max="1" step="0.1" value="0.4" oninput="updateSim()">
-            </div>
-
-            <div class="toggle-group">
-                <label for="reg">Regolarizzazione Lavoratori</label>
-                <input type="checkbox" id="reg" checked onchange="updateSim()">
-            </div>
-
-            <!-- SISTEMA DI ALERT -->
-            <div class="alerts-container">
-                <div id="alert-fuga" class="alert alert-fuga">
-                    ⚠️ <strong>ALLARME FUGA CAPITALI:</strong> Tassazione punitiva! Le aziende stanno scappando all'estero.
+    <!-- MAIN WORKSPACE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+        
+        <!-- COLONNA 1: CONTROLLI (3/12) -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+            <div class="panel border-t-2 border-t-indigo-500">
+                <h2 class="text-sm font-black mb-5 text-slate-200 tracking-wider">INPUT POLITICI</h2>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Scala Mobile (sm)</label><span id="v-sm" class="text-xs font-black text-indigo-400 font-mono">0%</span></div>
+                        <input type="range" id="sm" min="0" max="100" value="0" class="slider" style="accent-color: #6366f1;">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Extraprofitti (te)</label><span id="v-te" class="text-xs font-black text-red-400 font-mono">15%</span></div>
+                        <input type="range" id="te" min="0" max="95" value="15" class="slider" style="accent-color: #f87171;">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Migrazione (fm)</label><span id="v-fm" class="text-xs font-black text-emerald-400 font-mono">0.35</span></div>
+                        <input type="range" id="fm" min="0" max="100" value="35" class="slider" style="accent-color: #34d399;">
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800">
+                        <label class="text-xs font-bold text-slate-400">Regolarizzazione (reg)</label>
+                        <input type="checkbox" id="regToggle" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+                    </div>
                 </div>
-                <div id="alert-poverta" class="alert alert-poverta">
-                    📉 <strong>CRISI SOCIALE:</strong> Potere d'acquisto crollato. La demografia è in caduta libera!
+            </div>
+
+            <div class="panel flex-grow">
+                <h2 class="text-xs font-black mb-3 text-slate-500 tracking-wider">DICTIONARY</h2>
+                <div class="flex flex-wrap gap-2">
+                    <span class="badge"><span class="text-blue-400">potere</span> = currS/currP</span>
+                    <span class="badge"><span class="text-blue-400">inflBase</span> = 0.018/0.08</span>
+                    <span class="badge">sm, te, fm</span>
+                    <span class="badge">reg (1 o 0)</span>
+                    <span class="badge">currS, currP, currD</span>
                 </div>
-                <div id="alert-inflazione" class="alert alert-inflazione">
-                    🔥 <strong>IPERINFLAZIONE:</strong> I prezzi sono fuori controllo!
+                <div id="error-log" class="mt-4 text-[11px] text-red-400 font-mono font-bold leading-tight"></div>
+            </div>
+        </div>
+
+        <!-- COLONNA 2: TERMINALE LOGICO (4/12) -->
+        <div class="lg:col-span-4 panel border-t-2 border-t-emerald-500 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-black text-slate-200 tracking-wider">LOGIC ENGINE</h2>
+                <span class="text-[9px] text-emerald-500 font-mono uppercase border border-emerald-500/30 px-2 py-0.5 rounded">Execution Order: Top to Bottom</span>
+            </div>
+            
+            <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                <div>
+                    <label class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-pink-400">1 - </span> Calo Demografico (demo)</label>
+                    <textarea id="eq-demo" class="code-input" rows="1">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0)</textarea>
                 </div>
-                <div id="alert-debito" class="alert alert-debito">
-                    💣 <strong>RISCHIO DEFAULT:</strong> Debito esploso. I mercati non ci prestano più soldi!
+                <div>
+                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2 - </span> Fuga Capitali (fuga)</label>
+                    <textarea id="eq-fuga" class="code-input" rows="1">(te > 0.45) ? (te - 0.45) * 6 : 0</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-emerald-400">3 - </span> Gap Manodopera (gap)</label>
+                    <textarea id="eq-gap" class="code-input" rows="1">demo - (fm * (reg ? 0.95 : 0.35))</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-red-400">4 - </span> Inflazione (infl)</label>
+                    <textarea id="eq-infl" class="code-input" rows="1">inflBase + (sm * 0.05) - (te * 0.01)</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-blue-400">5 - </span> Variazione Salari (deltaW)</label>
+                    <textarea id="eq-wage" class="code-input" rows="1">(infl * sm) + (gap * 0.18) + 0.002</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-white uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-white">6 - </span> Incremento Debito (deltaD)</label>
+                    <textarea id="eq-debt" class="code-input" rows="2">(sm * 5) + (demo * 180) - (reg ? fm * 12 : 0) + (fuga * 35) - (te * 8) - 1.5</textarea>
                 </div>
             </div>
         </div>
 
-        <!-- AREA GRAFICO E STATISTICHE -->
-        <div class="main-area">
-            
-            <div class="status-cards">
-                <div class="card">
-                    <div class="icon">💼</div>
-                    <h3>Salari vs Prezzi</h3>
-                    <div class="value" id="status-potere">100%</div>
-                </div>
-                <div class="card">
-                    <div class="icon">📈</div>
-                    <h3>Debito Finale</h3>
-                    <div class="value" id="status-debito">130%</div>
-                </div>
-                <div class="card">
-                    <div class="icon">🏭</div>
-                    <h3>Salute Imprese</h3>
-                    <div class="value" id="status-imprese">Stabile</div>
-                </div>
+        <!-- COLONNA 3: MONITORAGGIO (5/12) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="panel flex-grow relative pb-8">
+                <h3 class="absolute top-4 right-5 text-[10px] font-bold text-slate-500 font-mono uppercase">Salari vs Prezzi</h3>
+                <canvas id="chartWages"></canvas>
             </div>
-
-            <div class="chart-container">
-                <canvas id="ecoChart"></canvas>
+            <div class="panel flex-grow relative pb-8">
+                <h3 class="absolute top-4 right-5 text-[10px] font-bold text-slate-500 font-mono uppercase">Debito Macro</h3>
+                <canvas id="chartMacro"></canvas>
             </div>
-            
         </div>
     </div>
 
     <script>
-        let ecoChart;
+        let chartW, chartM;
+        const ANNI = Array.from({length: 35}, (_, i) => 1992 + i);
+        
+        // Ghost Lines (Benchmark)
+        const realWages = ANNI.map((a, i) => 1000 * Math.pow(1.004, i));
+        let pB = 1000;
+        const realPrices = ANNI.map(a => { pB *= (1 + (a > 2021 ? 0.07 : a > 2000 ? 0.018 : 0.04)); return pB; });
+        const realDebt = ANNI.map((a, i) => 105 + (i * 1.65) + (a > 2020 ? 18 : 0));
 
-        function initChart() {
-            const ctx = document.getElementById('ecoChart').getContext('2d');
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.font.family = "'Segoe UI', sans-serif";
+        // Motore di valutazione sicuro
+        function evaluateExpression(expr, context) {
+            const keys = Object.keys(context);
+            const values = Object.values(context);
+            const func = new Function(...keys, `return (${expr});`);
+            return func(...values);
+        }
 
-            ecoChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 30}, (_, i) => `Anno ${i+1}`),
-                    datasets: [
-                        { label: 'Salari Reali', borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', data: [], borderWidth: 3, fill: true, tension: 0.4 },
-                        { label: 'Prezzi (Inflazione)', borderColor: '#f87171', backgroundColor: 'transparent', borderDash: [5, 5], data: [], borderWidth: 2, tension: 0.4 },
-                        { label: 'Debito Pubblico', borderColor: '#f8fafc', backgroundColor: 'transparent', data: [], borderWidth: 4, tension: 0.4 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { font: { size: 14 } } } },
-                    scales: {
-                        y: { grid: { color: '#334155' } },
-                        x: { grid: { color: '#334155' } }
-                    }
+        function setStatus(isError, msg = "") {
+            const led = document.getElementById('status-led');
+            const log = document.getElementById('error-log');
+            document.querySelectorAll('.code-input').forEach(el => el.classList.remove('error'));
+            
+            if (isError) {
+                led.className = "text-xs font-mono font-bold px-3 py-1 rounded bg-red-500/10 text-red-500 border border-red-500/50 flex items-center gap-2";
+                led.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> ERROR`;
+                log.innerText = `🚨 ${msg}`;
+            } else {
+                led.className = "text-xs font-mono font-bold px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-2";
+                led.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE`;
+                log.innerText = "";
+            }
+        }
+
+        function simulate() {
+            // Lettura Inputs
+            const sm = document.getElementById('sm').value / 100;
+            const te = document.getElementById('te').value / 100;
+            const fm = document.getElementById('fm').value / 100;
+            const reg = document.getElementById('regToggle').checked ? 1 : 0;
+
+            // Update UI Labels
+            document.getElementById('v-sm').innerText = (sm * 100).toFixed(0) + "%";
+            document.getElementById('v-te').innerText = (te * 100).toFixed(0) + "%";
+            document.getElementById('v-fm').innerText = fm.toFixed(2);
+
+            let s = [], p = [], d = [];
+            let currS = 1000, currP = 1000, currD = 105;
+            let currentEqId = "";
+
+            try {
+                ANNI.forEach((anno) => {
+                    // Contesto Base Globale per questo anno
+                    let ctx = { anno, sm, te, fm, reg, currS, currP, currD };
+                    ctx.inflBase = (anno > 2021) ? 0.08 : 0.018;
+                    ctx.potere = currS / currP;
+
+                    // Esecuzione a Cascata: ogni passo arricchisce il contesto (ctx)
+                    currentEqId = 'eq-demo'; ctx.demo = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-fuga'; ctx.fuga = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-gap';  ctx.gap  = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-infl'; ctx.infl = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-wage'; ctx.deltaW = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-debt'; ctx.deltaD = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+
+                    // Salvataggio Dati
+                    s.push(currS); p.push(currP); d.push(currD);
+
+                    // Aggiornamento Stato Reale
+                    currS *= (1 + ctx.deltaW);
+                    currP *= (1 + ctx.infl);
+                    currD += ctx.deltaD;
+                });
+                
+                setStatus(false);
+                render(s, p, d);
+
+            } catch (e) {
+                setStatus(true, `Syntax Error at [${currentEqId.replace('eq-','').toUpperCase()}]:\n${e.message}`);
+                document.getElementById(currentEqId).classList.add('error');
+            }
+        }
+
+        // Configurazione Globale Grafici
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        
+        function render(s, p, d) {
+            if(chartW) chartW.destroy(); if(chartM) chartM.destroy();
+            
+            const gridOpts = { color: '#1e293b', drawBorder: false };
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                scales: { 
+                    x: { grid: { display: false } }, 
+                    y: { grid: gridOpts } 
                 }
+            };
+
+            chartW = new Chart(document.getElementById('chartWages'), {
+                type: 'line',
+                data: { labels: ANNI, datasets: [
+                    { label: 'SIM Salari', data: s, borderColor: '#6366f1', borderWidth: 2, tension: 0.2, pointRadius: 0 },
+                    { label: 'SIM Prezzi', data: p, borderColor: '#f43f5e', borderWidth: 2, borderDash: [4,4], tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Prezzi', data: realPrices, borderColor: '#475569', borderWidth: 1, tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Salari', data: realWages, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], tension: 0.2, pointRadius: 0 }
+                ]}, options: commonOptions
+            });
+
+            chartM = new Chart(document.getElementById('chartMacro'), {
+                type: 'line',
+                data: { labels: ANNI, datasets: [
+                    { label: 'SIM Debito', data: d, borderColor: '#f8fafc', borderWidth: 2, tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Debito', data: realDebt, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], tension: 0.2, pointRadius: 0 }
+                ]}, options: commonOptions
             });
         }
 
-        function updateSim() {
-            // Lettura Input
-            const sm = parseFloat(document.getElementById('sm').value);
-            const te = parseFloat(document.getElementById('te').value);
-            const fm = parseFloat(document.getElementById('fm').value);
-            const reg = document.getElementById('reg').checked;
-
-            // Aggiorna etichette testuali
-            document.getElementById('sm-val').innerText = sm.toFixed(1);
-            document.getElementById('te-val').innerText = (te * 100).toFixed(0) + "%";
-            document.getElementById('fm-val').innerText = fm.toFixed(1);
-
-            // Variabili iniziali
-            let w = 100; // Salari
-            let p = 100; // Prezzi
-            let d = 130; // Debito Iniziale
-            
-            let dataW = [];
-            let dataP = [];
-            let dataD = [];
-
-            // Variabili per gli Alert
-            let piccoInflazione = 0;
-            let potereAcquistoMinimo = 1;
-            let fugaAttiva = false;
-
-            // Simulazione 30 anni
-            for (let anno = 1; anno <= 30; anno++) {
-                let potere = w / p;
-                if (potere < potereAcquistoMinimo) potereAcquistoMinimo = potere;
-
-                // EQUAZIONI BLINDATE
-                let demo = 0.018 + (potere < 0.9 ? (0.9 - potere) * 0.5 : 0);
-                let fuga = (te > 0.23) ? (te - 0.23) * 1.5 : 0;
-                if (fuga > 0) fugaAttiva = true;
-
-                let gap = demo + (fm * (reg ? Math.pow(1-fm,2) : -0.25));
-                
-                let inflBase = 0.02; // Inflazione strutturale base
-                let infl = inflBase + (sm * 0.05) - (te * 0.01) + (anno * 0.000004);
-                if (infl > piccoInflazione) piccoInflazione = infl;
-
-                let deltaw = (infl * sm) + (gap * 0.18) + 0.002;
-                let deltad = (sm * 5) + (demo * 10) + (fuga * 35) - (te * 5) - (infl * 40) + 2.4;
-
-                // Aggiornamento Valori Assoluti
-                p = p * (1 + infl);
-                w = w * (1 + deltaw);
-                d = d + deltad;
-
-                dataW.push(w);
-                dataP.push(p);
-                dataD.push(d);
-            }
-
-            // Aggiorna Grafico
-            ecoChart.data.datasets[0].data = dataW;
-            ecoChart.data.datasets[1].data = dataP;
-            ecoChart.data.datasets[2].data = dataD;
-            ecoChart.update();
-
-            // GESTIONE STATUS CARDS
-            let potereFinale = (dataW[29] / dataP[29]);
-            document.getElementById('status-potere').innerText = (potereFinale * 100).toFixed(1) + "%";
-            document.getElementById('status-potere').style.color = potereFinale < 0.9 ? "var(--accent-red)" : "var(--accent-green)";
-
-            document.getElementById('status-debito').innerText = dataD[29].toFixed(1) + "%";
-            document.getElementById('status-debito').style.color = dataD[29] > 160 ? "var(--accent-red)" : "var(--text-main)";
-
-            let impreseStatus = document.getElementById('status-imprese');
-            if (fugaAttiva) {
-                impreseStatus.innerText = "In Fuga 📉";
-                impreseStatus.style.color = "var(--accent-red)";
-            } else if (te > 0.15) {
-                impreseStatus.innerText = "Sotto Pressione ⚠️";
-                impreseStatus.style.color = "var(--accent-yellow)";
-            } else {
-                impreseStatus.innerText = "Operative 🏭";
-                impreseStatus.style.color = "var(--accent-green)";
-            }
-
-            // GESTIONE ALERTS (Gamification)
-            // Fuga Capitali
-            document.getElementById('alert-fuga').classList.toggle('active', fugaAttiva);
-            // Povertà (Potere d'acquisto < 90%)
-            document.getElementById('alert-poverta').classList.toggle('active', potereAcquistoMinimo < 0.9);
-            // Iperinflazione (> 8%)
-            document.getElementById('alert-inflazione').classList.toggle('active', piccoInflazione > 0.08);
-            // Debito fuori controllo (supera 180%)
-            document.getElementById('alert-debito').classList.toggle('active', dataD[29] > 180);
-        }
-
-        // Avvio iniziale
-        window.onload = () => {
-            initChart();
-            updateSim();
-        };
+        // Listeners
+        document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', simulate));
+        window.addEventListener('resize', simulate); // Redraw su resize per responsività
+        simulate(); // Avvio Iniziale
     </script>
 </body>
 </html>
+
+
