@@ -15,7 +15,6 @@
         
         .panel { @apply bg-[#0f172a] border border-slate-800/80 rounded-xl p-5 shadow-2xl; }
         
-        /* I box delle equazioni ad altissimo contrasto come richiesto */
         .code-input { 
             @apply w-full border border-slate-700 rounded-md p-3 text-[12px] font-mono transition-all outline-none;
             background-color: #000000; 
@@ -31,7 +30,6 @@
 </head>
 <body class="p-4 lg:p-6 min-h-screen flex flex-col">
 
-    <!-- HEADER -->
     <header class="mb-6 flex justify-between items-end border-b border-slate-800 pb-4">
         <div>
             <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 tracking-tight">SOVEREIGN LAB</h1>
@@ -42,14 +40,17 @@
         </div>
     </header>
 
-    <!-- MAIN WORKSPACE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
-        <!-- COLONNA 1: CONTROLLI (3/12) -->
         <div class="lg:col-span-3 flex flex-col gap-6">
             <div class="panel border-t-2 border-t-indigo-500">
                 <h2 class="text-sm font-black mb-5 text-slate-200 tracking-wider">INPUT POLITICI</h2>
                 <div class="space-y-6">
+                    <!-- NUOVO SLIDER: RATIO SALARIALE -->
+                    <div>
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Ratio Salariale (1:X)</label><span id="v-ratio" class="text-xs font-black text-purple-400 font-mono">20</span></div>
+                        <input type="range" id="ratio" min="5" max="50" value="20" class="slider" style="accent-color: #a855f7;">
+                    </div>
                     <div>
                         <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Scala Mobile (sm)</label><span id="v-sm" class="text-xs font-black text-indigo-400 font-mono">0%</span></div>
                         <input type="range" id="sm" min="0" max="100" value="0" class="slider" style="accent-color: #6366f1;">
@@ -74,7 +75,7 @@
                 <div class="flex flex-wrap gap-2">
                     <span class="badge"><span class="text-blue-400">potere</span> = currS/currP</span>
                     <span class="badge"><span class="text-blue-400">inflBase</span> = 0.018/0.08</span>
-                    <span class="badge">sm, te, fm</span>
+                    <span class="badge">ratio, sm, te, fm</span>
                     <span class="badge">reg (1 o 0)</span>
                     <span class="badge">currS, currP, currD</span>
                 </div>
@@ -82,7 +83,6 @@
             </div>
         </div>
 
-        <!-- COLONNA 2: TERMINALE LOGICO (4/12) -->
         <div class="lg:col-span-4 panel border-t-2 border-t-emerald-500 flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-sm font-black text-slate-200 tracking-wider">LOGIC ENGINE</h2>
@@ -92,11 +92,11 @@
             <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
                 <div>
                     <label class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-pink-400">1 - </span> Calo Demografico (demo)</label>
-                    <textarea id="eq-demo" class="code-input" rows="1">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0)</textarea>
+                    <textarea id="eq-demo" class="code-input" rows="1">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0) - (ratio < 12 ? 0.005 : 0)</textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2 - </span> Fuga Capitali (fuga)</label>
-                    <textarea id="eq-fuga" class="code-input" rows="1">(te > 0.45) ? (te - 0.45) * 6 : 0</textarea>
+                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2 - </span> Fuga Capitali e Cervelli (fuga)</label>
+                    <textarea id="eq-fuga" class="code-input" rows="1">((te > 0.45) ? (te - 0.45) * 6 : 0) + ((ratio < 12) ? (12 - ratio) * 0.1 : 0)</textarea>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-emerald-400">3 - </span> Gap Manodopera (gap)</label>
@@ -117,7 +117,6 @@
             </div>
         </div>
 
-        <!-- COLONNA 3: MONITORAGGIO (5/12) -->
         <div class="lg:col-span-5 flex flex-col gap-4">
             <div class="panel flex-grow relative pb-8">
                 <h3 class="absolute top-4 right-5 text-[10px] font-bold text-slate-500 font-mono uppercase">Salari vs Prezzi</h3>
@@ -134,13 +133,11 @@
         let chartW, chartM;
         const ANNI = Array.from({length: 35}, (_, i) => 1992 + i);
         
-        // Ghost Lines (Benchmark)
         const realWages = ANNI.map((a, i) => 1000 * Math.pow(1.004, i));
         let pB = 1000;
         const realPrices = ANNI.map(a => { pB *= (1 + (a > 2021 ? 0.07 : a > 2000 ? 0.018 : 0.04)); return pB; });
         const realDebt = ANNI.map((a, i) => 105 + (i * 1.65) + (a > 2020 ? 18 : 0));
 
-        // Motore di valutazione sicuro
         function evaluateExpression(expr, context) {
             const keys = Object.keys(context);
             const values = Object.values(context);
@@ -165,16 +162,16 @@
         }
 
         function simulate() {
-            // Lettura Inputs
             const sm = document.getElementById('sm').value / 100;
             const te = document.getElementById('te').value / 100;
             const fm = document.getElementById('fm').value / 100;
+            const ratio = parseFloat(document.getElementById('ratio').value);
             const reg = document.getElementById('regToggle').checked ? 1 : 0;
 
-            // Update UI Labels
             document.getElementById('v-sm').innerText = (sm * 100).toFixed(0) + "%";
             document.getElementById('v-te').innerText = (te * 100).toFixed(0) + "%";
             document.getElementById('v-fm').innerText = fm.toFixed(2);
+            document.getElementById('v-ratio').innerText = "1:" + ratio;
 
             let s = [], p = [], d = [];
             let currS = 1000, currP = 1000, currD = 105;
@@ -182,12 +179,10 @@
 
             try {
                 ANNI.forEach((anno) => {
-                    // Contesto Base Globale per questo anno
-                    let ctx = { anno, sm, te, fm, reg, currS, currP, currD };
+                    let ctx = { anno, sm, te, fm, ratio, reg, currS, currP, currD };
                     ctx.inflBase = (anno > 2021) ? 0.08 : 0.018;
                     ctx.potere = currS / currP;
 
-                    // Esecuzione a Cascata: ogni passo arricchisce il contesto (ctx)
                     currentEqId = 'eq-demo'; ctx.demo = evaluateExpression(document.getElementById(currentEqId).value, ctx);
                     currentEqId = 'eq-fuga'; ctx.fuga = evaluateExpression(document.getElementById(currentEqId).value, ctx);
                     currentEqId = 'eq-gap';  ctx.gap  = evaluateExpression(document.getElementById(currentEqId).value, ctx);
@@ -195,10 +190,8 @@
                     currentEqId = 'eq-wage'; ctx.deltaW = evaluateExpression(document.getElementById(currentEqId).value, ctx);
                     currentEqId = 'eq-debt'; ctx.deltaD = evaluateExpression(document.getElementById(currentEqId).value, ctx);
 
-                    // Salvataggio Dati
                     s.push(currS); p.push(currP); d.push(currD);
 
-                    // Aggiornamento Stato Reale
                     currS *= (1 + ctx.deltaW);
                     currP *= (1 + ctx.infl);
                     currD += ctx.deltaD;
@@ -213,7 +206,6 @@
             }
         }
 
-        // Configurazione Globale Grafici
         Chart.defaults.color = '#64748b';
         Chart.defaults.font.family = "'Fira Code', monospace";
         
@@ -250,12 +242,9 @@
             });
         }
 
-        // Listeners
         document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', simulate));
-        window.addEventListener('resize', simulate); // Redraw su resize per responsività
-        simulate(); // Avvio Iniziale
+        window.addEventListener('resize', simulate);
+        simulate();
     </script>
 </body>
 </html>
-
-
