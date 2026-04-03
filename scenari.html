@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Economia Civica - Liceo Artistico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .slider { @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600; }
+        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+        <header class="mb-8 border-b pb-4">
+            <h1 class="text-3xl font-bold text-indigo-900">Equilibria <span class="text-indigo-500">1992-202X</span></h1>
+            <p class="text-gray-600 italic">Simulatore di politiche monetarie e potere d'acquisto</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- CONTROLLI -->
+            <div class="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Manovre Politiche</h2>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Scala Mobile (Protezione %)</label>
+                    <input type="range" id="scalaMobile" min="0" max="100" value="0" class="slider">
+                    <span id="v-scalaMobile" class="text-indigo-600 font-bold">0%</span>
+                    <p class="text-xs text-gray-500 mt-1">Recupero dell'inflazione sui salari.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tetto Salariale (Ratio Max/Min)</label>
+                    <input type="range" id="ratioCap" min="5" max="100" value="100" class="slider">
+                    <span id="v-ratioCap" class="text-indigo-600 font-bold">1:100</span>
+                    <p class="text-xs text-gray-500 mt-1">Limite tra stipendio CEO e operaio.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tassa Extraprofitti/Dividendi</label>
+                    <input type="range" id="tassaExtra" min="0" max="80" value="20" class="slider">
+                    <span id="v-tassaExtra" class="text-indigo-600 font-bold">20%</span>
+                    <p class="text-xs text-gray-500 mt-1">Risorse per il welfare e stabilità debito.</p>
+                </div>
+
+                <div class="pt-4 border-t">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Solvibilità Stato:</span>
+                        <span id="solvibilita" class="px-3 py-1 rounded-full text-white font-bold bg-green-500">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRAFICI -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="h-64 md:h-80">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                    <h3 class="text-sm font-bold text-indigo-800 uppercase tracking-wider mb-2">Analisi degli effetti:</h3>
+                    <p id="feedback" class="text-sm text-indigo-900 leading-relaxed italic">
+                        Muovi gli slider per vedere come la politica di Amato del 1992 ha influenzato la "forbice" tra prezzi e salari.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        let chart;
+
+        // Elementi DOM
+        const inputs = ['scalaMobile', 'ratioCap', 'tassaExtra'];
+        const values = {};
+        inputs.forEach(id => {
+            values[id] = document.getElementById(id);
+            values['display_' + id] = document.getElementById('v-' + id);
+        });
+
+        function updateSim() {
+            const sm = values.scalaMobile.value / 100;
+            const rc = values.ratioCap.value;
+            const te = values.tassaExtra.value / 100;
+
+            // Update Labels
+            values.display_scalaMobile.innerText = (sm * 100).toFixed(0) + "%";
+            values.display_ratioCap.innerText = "1:" + rc;
+            values.display_tassaExtra.innerText = (te * 100).toFixed(0) + "%";
+
+            // Calcoli Simulazione (10 anni)
+            const labels = [];
+            const prezzi = [];
+            const salari = [];
+            let currentPrezzo = 1000;
+            let currentSalario = 1000;
+            const inflazioneAnnua = 0.05; // 5% fissa per l'esercizio
+
+            for (let i = 0; i <= 10; i++) {
+                labels.push("Anno " + i);
+                prezzi.push(currentPrezzo.toFixed(0));
+                salari.push(currentSalario.toFixed(0));
+
+                // Dinamica: i prezzi salgono
+                currentPrezzo *= (1 + inflazioneAnnua);
+                // Il salario sale in base alla scala mobile + redistribuzione del tetto salariale
+                let bonusEquita = (100 / rc) * 5; 
+                currentSalario *= (1 + (inflazioneAnnua * sm));
+                currentSalario += bonusEquita;
+            }
+
+            // Calcolo Solvibilità (Semplificato)
+            // Se la tassa è troppo bassa e la scala mobile troppo alta, lo Stato va in crisi
+            let solv = 100 - (sm * 40) + (te * 50) - ((100/rc) * 10);
+            solv = Math.min(Math.max(solv, 0), 100);
+            
+            const sEl = document.getElementById('solvibilita');
+            sEl.innerText = solv.toFixed(0) + "%";
+            sEl.className = `px-3 py-1 rounded-full text-white font-bold ${solv > 60 ? 'bg-green-500' : solv > 30 ? 'bg-yellow-500' : 'bg-red-500'}`;
+
+            // Feedback dinamico
+            const feedback = document.getElementById('feedback');
+            if(sm < 0.2) feedback.innerText = "L'assenza di scala mobile sta creando una 'forbice' enorme. Il potere d'acquisto crolla, ma i mercati sono tranquilli.";
+            else if(solv < 40) feedback.innerText = "Attenzione: l'alta protezione salariale senza entrate fiscali adeguate sta rendendo il debito insostenibile. Rischio default!";
+            else feedback.innerText = "Hai trovato un equilibrio dinamico. I salari tengono il passo, ma osserva come cambia la pendenza della curva.";
+
+            updateChart(labels, prezzi, salari);
+        }
+
+        function updateChart(labels, prezzi, salari) {
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Costo della Vita (Prezzi)', data: prezzi, borderColor: '#ef4444', tension: 0.1, fill: false },
+                        { label: 'Salario Medio', data: salari, borderColor: '#10b981', tension: 0.1, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: false } }
+                }
+            });
+        }
+
+        inputs.forEach(id => document.getElementById(id).addEventListener('input', updateSim));
+        updateSim(); // Init
+    </script>
+</body>
+</html>
