@@ -2,74 +2,103 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign Simulator v5.0: Equilibrium Edition</title>
+    <title>Macro Lab: God Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .slider { @apply w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500; }
-        body { background-color: #020617; color: #f1f5f9; font-family: 'Inter', sans-serif; }
-        .card { @apply bg-slate-900/50 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm; }
-        .metric-label { @apply text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1; }
+        body { background: #020617; color: #f8fafc; font-family: 'Fira Code', monospace; }
+        .slider { @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500; }
+        .card { @apply bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow-2xl backdrop-blur-md; }
+        .code-input { @apply w-full bg-black/50 border border-slate-700 rounded p-2 text-xs text-emerald-400 focus:border-blue-500 outline-none font-mono mt-1; }
+        .label-eq { @apply text-[10px] font-bold text-slate-500 uppercase tracking-tighter; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
-    <div class="max-w-7xl mx-auto space-y-6">
-        <header class="flex flex-col md:flex-row justify-between items-center gap-6 card border-indigo-500/20">
-            <div>
-                <h1 class="text-2xl font-black tracking-tighter uppercase">Market <span class="text-indigo-500">Equilibrium</span> v5.0</h1>
-                <p class="text-slate-400 text-xs italic">Modello Scarsità vs Surplus di Manodopera</p>
-            </div>
-            <div id="status-box" class="p-4 rounded-2xl min-w-[280px] text-center border-b-4 border-green-500 bg-slate-800/50">
-                <div class="metric-label tracking-widest text-white">Solvibilità Stato</div>
-                <div id="solvibilita" class="text-4xl font-black text-green-400">100%</div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="card space-y-8 h-fit">
-                <section class="space-y-6">
-                    <h3 class="metric-label text-indigo-400 border-b border-slate-800 pb-2">Parametri</h3>
-                    
+    <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- COLONNA SINISTRA: PARAMETRI -->
+        <div class="lg:col-span-3 space-y-4">
+            <div class="card border-blue-500/30">
+                <h2 class="text-lg font-black text-blue-500 mb-4 italic underline">CONTROL PANEL</h2>
+                
+                <div class="space-y-4">
                     <div>
-                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold">Scala Mobile</label><span id="v-sm" class="text-xs font-black text-indigo-400">0%</span></div>
+                        <div class="flex justify-between"><label class="label-eq text-white">Scala Mobile (sm)</label><span id="v-sm" class="text-xs text-blue-400">0%</span></div>
                         <input type="range" id="sm" min="0" max="100" value="0" class="slider">
                     </div>
-
                     <div>
-                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold">Tassa Extraprofitti</label><span id="v-te" class="text-xs font-black text-red-500">15%</span></div>
-                        <input type="range" id="te" min="0" max="95" value="15" class="slider accent-red-600">
+                        <div class="flex justify-between"><label class="label-eq text-white">Extraprofitti (te)</label><span id="v-te" class="text-xs text-red-400">15%</span></div>
+                        <input type="range" id="te" min="0" max="90" value="15" class="slider">
                     </div>
-
-                    <div class="pt-4 border-t border-slate-800">
-                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold">Flusso Migratorio</label><span id="v-fm" class="text-xs font-black text-indigo-400">30%</span></div>
-                        <input type="range" id="fm" min="0" max="100" value="30" class="slider">
-                        
-                        <div class="mt-4 flex items-center justify-between bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                            <label class="text-[10px] font-black uppercase text-slate-300">Regolarizzazione</label>
-                            <input type="checkbox" id="regToggle" class="w-5 h-5 accent-indigo-500 cursor-pointer"/>
-                        </div>
+                    <div>
+                        <div class="flex justify-between"><label class="label-eq text-white">Flusso Migr. (fm)</label><span id="v-fm" class="text-xs text-emerald-400">0.35</span></div>
+                        <input type="range" id="fm" min="0" max="100" value="35" class="slider">
                     </div>
-                </section>
-                
-                <div class="text-[10px] text-slate-500 leading-tight p-2 bg-black/20 rounded">
-                    <strong>Logic Fix:</strong> Se il flusso supera il calo demografico, i salari scendono per eccesso di offerta. Se il flusso è basso, i salari salgono per scarsità ma l'economia rallenta.
+                    <div class="flex items-center justify-between p-2 bg-slate-800/50 rounded border border-slate-700">
+                        <label class="label-eq text-white">Regolarizzazione (reg)</label>
+                        <input type="checkbox" id="regToggle" class="w-4 h-4 accent-emerald-500">
+                    </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-3 space-y-6">
-                <div id="warning-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                <div class="card h-[38vh]"><canvas id="chartSalari"></canvas></div>
-                <div class="card h-[38vh]"><canvas id="chartMacro"></canvas></div>
+            <!-- EDITOR DI EQUAZIONI -->
+            <div class="card border-emerald-500/20">
+                <h2 class="text-xs font-black text-emerald-500 mb-3 tracking-widest uppercase">Equation Engine (Live)</h2>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="label-eq">1. Variazione Salariale (deltaW)</label>
+                        <textarea id="eq-wage" class="code-input" rows="2">(infl * sm) + (gap * 0.15) + 0.005</textarea>
+                    </div>
+                    <div>
+                        <label class="label-eq">2. Inflazione Effettiva (infl)</label>
+                        <textarea id="eq-infl" class="code-input" rows="2">inflBase + (sm * 0.04) - (te * 0.015)</textarea>
+                    </div>
+                    <div>
+                        <label class="label-eq">3. Incremento Debito (deltaD)</label>
+                        <textarea id="eq-debt" class="code-input" rows="3">(sm * 6) + (demo * 150) - (reg ? fm * 15 : 0) + (fuga * 30) - (te * 10) - 2</textarea>
+                    </div>
+                    <div>
+                        <label class="label-eq">4. Calo Demografico (demo)</label>
+                        <textarea id="eq-demo" class="code-input" rows="2">0.015 + (potere < 1 ? (1 - potere) * 0.4 : 0)</textarea>
+                    </div>
+                </div>
+                <p id="error-log" class="text-[9px] text-red-500 mt-2 italic font-bold"></p>
+            </div>
+        </div>
+
+        <!-- COLONNA DESTRA: GRAFICI -->
+        <div class="lg:col-span-9 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card h-[43vh]"><canvas id="chartWages"></canvas></div>
+                <div class="card h-[43vh]"><canvas id="chartMacro"></canvas></div>
+            </div>
+            
+            <div class="card bg-black/40 border-slate-800">
+                <div class="flex gap-6 items-center overflow-x-auto text-[10px] font-mono whitespace-nowrap">
+                    <span class="text-slate-500 font-bold uppercase">Variabili Disponibili:</span>
+                    <span class="text-blue-400">sm (Scala Mobile)</span>
+                    <span class="text-red-400">te (Extraprofitti)</span>
+                    <span class="text-emerald-400">fm (Flusso Migr)</span>
+                    <span class="text-white">reg (bool)</span>
+                    <span class="text-yellow-400">potere (S/P)</span>
+                    <span class="text-purple-400">gap (demo - fm)</span>
+                    <span class="text-orange-400">fuga (te > 0.45)</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let chartSalari, chartMacro;
+        let chartW, chartM;
+        const ANNI = Array.from({length: 35}, (_, i) => 1992 + i);
 
-        function update() {
+        // Benchmark Reali (Ghost)
+        const realWages = ANNI.map((a, i) => 1000 * Math.pow(1.005, i));
+        const realDebt = ANNI.map((a, i) => 105 + (i * 1.6) + (a > 2020 ? 15 : 0));
+
+        function runSimulation() {
             const sm = document.getElementById('sm').value / 100;
             const te = document.getElementById('te').value / 100;
             const fm = document.getElementById('fm').value / 100;
@@ -77,101 +106,102 @@
 
             document.getElementById('v-sm').innerText = (sm * 100).toFixed(0) + "%";
             document.getElementById('v-te').innerText = (te * 100).toFixed(0) + "%";
-            document.getElementById('v-fm').innerText = (fm * 100).toFixed(0) + "%";
+            document.getElementById('v-fm').innerText = fm.toFixed(2);
 
-            let anni = [], s = [], p = [], d = [], sol = [];
+            // Lettura Equazioni
+            const eqWageStr = document.getElementById('eq-wage').value;
+            const eqInflStr = document.getElementById('eq-infl').value;
+            const eqDebtStr = document.getElementById('eq-debt').value;
+            const eqDemoStr = document.getElementById('eq-demo').value;
+
+            let s = [], p = [], d = [], sol = [];
             let currS = 1000, currP = 1000, currD = 105;
-            let iperInflazione = false, capitalFlight = false;
+            const errLog = document.getElementById('error-log');
+            errLog.innerText = "";
 
-            for(let i = 1992; i <= 2026; i++) {
-                anni.push(i);
-                s.push(currS.toFixed(0));
-                p.push(currP.toFixed(0));
-                d.push(currD.toFixed(1));
+            try {
+                ANNI.forEach((anno) => {
+                    s.push(currS);
+                    p.push(currP);
+                    d.push(currD);
+                    sol.push(Math.max(0, 100 - (currD - 110)));
 
-                // 1. INFLAZIONE E CALO DEMOGRAFICO
-                let inflBase = (i >= 2008 && i <= 2012) ? 0.035 : (i >= 2021) ? 0.08 : 0.02;
-                let inflEffettiva = inflBase + (sm * 0.045) - (te * 0.02);
-                if(inflEffettiva > 0.12) iperInflazione = true;
+                    // Variabili base di ogni ciclo
+                    let inflBase = (anno > 2021) ? 0.08 : 0.02;
+                    let potere = currS / currP;
+                    let fuga = (te > 0.45) ? (te - 0.45) * 5 : 0;
 
-                let potereAcquisto = currS / currP;
-                let caloDemo = ((i / 1992) * 0.015) + (potereAcquisto < 0.9 ? (0.9 - potereAcquisto) * 0.3 : 0);
+                    // Esecuzione Equazioni Personalizzate
+                    // Usiamo new Function per valutare le stringhe come codice
+                    const evalDemo = new Function('potere', 'inflBase', 'sm', 'te', 'fm', 'reg', `return ${eqDemoStr}`);
+                    let demo = evalDemo(potere, inflBase, sm, te, fm, reg);
 
-                // 2. NUOVA LOGICA: EQUILIBRIO MERCATO LAVORO
-                // La "scarsità" è data dal calo demografico meno chi arriva
-                let gapLavoro = caloDemo - fm; 
-                let effettoSalariale = 0;
+                    const gap = demo - (fm * (reg ? 0.9 : 0.3));
 
-                if (reg) {
-                    // Se regolarizzati: i salari seguono la domanda/offerta
-                    // Se gapLavoro > 0 (scarsità), i salari salgono. 
-                    // Se gapLavoro < 0 (surplus di migranti), i salari scendono per competizione.
-                    effettoSalariale = gapLavoro * 0.12; 
-                } else {
-                    // Se irregolari: dumping puro. Il flusso abbassa sempre i salari,
-                    // e la scarsità demografica aiuta molto meno perché c'è il nero.
-                    effettoSalariale = -(fm * 0.15) + (caloDemo * 0.03);
-                }
+                    const evalInfl = new Function('inflBase', 'sm', 'te', 'fm', 'reg', `return ${eqInflStr}`);
+                    let infl = evalInfl(inflBase, sm, te, fm, reg);
 
-                currS *= (1 + (inflEffettiva * sm) + effettoSalariale + 0.003);
+                    const evalWage = new Function('infl', 'sm', 'gap', 'te', 'potere', `return ${eqWageStr}`);
+                    let deltaW = evalWage(infl, sm, gap, te, potere);
 
-                // 3. FUGA CAPITALI E MACRO
-                let fuga = (te > 0.45) ? Math.pow((te - 0.45) * 5, 2) : 0;
-                if(fuga > 0.5) capitalFlight = true;
+                    const evalDebt = new Function('sm', 'demo', 'reg', 'fm', 'fuga', 'te', `return ${eqDebtStr}`);
+                    let deltaD = evalDebt(sm, demo, reg, fm, fuga, te);
 
-                let erosione = (inflEffettiva * 14);
-                // Il beneficio al debito della migrazione satura: oltre il 120% del ricambio è un costo
-                let aiutoPIL = reg ? Math.min(fm, caloDemo * 1.2) * 18 : 0;
-                
-                currD += (sm * 7) - (te * 12) + (inflEffettiva * 16) - erosione + (caloDemo * 180) - aiutoPIL + (fuga * 25) - 5;
-                
-                let fiducia = 110 - (currD - 110)*0.8 - (inflEffettiva * 250) - (fuga * 60) + (reg ? 10 : -10);
-                sol.push(Math.min(Math.max(fiducia, 0), 100).toFixed(0));
-                
-                currP *= (1 + inflEffettiva);
+                    // Aggiornamento
+                    currS *= (1 + deltaW);
+                    currP *= (1 + infl);
+                    currD += deltaD;
+                });
+            } catch (e) {
+                errLog.innerText = "Syntax Error: " + e.message;
             }
 
-            // UI WARNINGS
-            const warnBox = document.getElementById('warning-container');
-            warnBox.innerHTML = '';
-            if (iperInflazione) warnBox.innerHTML += `<div class="bg-red-500/20 border border-red-500 text-red-200 p-2 rounded text-[10px] animate-pulse">⚠️ IPERINFLAZIONE</div>`;
-            if (capitalFlight) warnBox.innerHTML += `<div class="bg-yellow-500/20 border border-yellow-500 text-yellow-200 p-2 rounded text-[10px]">⚠️ FUGA DEI CAPITALI</div>`;
-            if (currS/currP < 0.7) warnBox.innerHTML += `<div class="bg-orange-500/20 border border-orange-500 text-orange-200 p-2 rounded text-[10px]">⚠️ POVERTÀ DIFFUSA</div>`;
-
-            const sEl = document.getElementById('solvibilita');
-            const lastSolv = sol[sol.length - 1];
-            sEl.innerText = lastSolv + "%";
-            sEl.className = `text-4xl font-black ${lastSolv > 70 ? 'text-green-400' : lastSolv > 40 ? 'text-amber-400' : 'text-red-500'}`;
-
-            render(anni, s, p, d, sol);
+            render(s, p, d, sol);
         }
 
-        function render(labels, s, p, d, sol) {
-            if(chartSalari) chartSalari.destroy();
-            if(chartMacro) chartMacro.destroy();
-            const common = { maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
-                scales: { x: { ticks: { color: '#475569', font: { size: 9 } }, grid: { display: false } },
-                y: { ticks: { color: '#475569', font: { size: 9 } }, grid: { color: '#1e293b' } } }
+        function render(s, p, d, sol) {
+            if(chartW) chartW.destroy();
+            if(chartM) chartM.destroy();
+
+            const options = {
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { labels: { color: '#64748b', font: { size: 10 } } } },
+                scales: { 
+                    x: { ticks: { color: '#475569', font: { size: 9 } } }, 
+                    y: { ticks: { color: '#475569', font: { size: 9 } }, grid: { color: '#1e293b' } } 
+                }
             };
-            chartSalari = new Chart(document.getElementById('chartSalari'), {
+
+            chartW = new Chart(document.getElementById('chartWages'), {
                 type: 'line',
-                data: { labels, datasets: [
-                    { label: 'Salari', data: s, borderColor: '#6366f1', borderWidth: 3, pointRadius: 0 },
-                    { label: 'Prezzi', data: p, borderColor: '#f43f5e', borderDash: [4,4], pointRadius: 0 }
-                ]}, options: common
+                data: {
+                    labels: ANNI,
+                    datasets: [
+                        { label: 'SIM: Salari', data: s, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0 },
+                        { label: 'SIM: Prezzi', data: p, borderColor: '#ef4444', borderDash: [3,3], pointRadius: 0 },
+                        { label: 'REAL: Salari (Ghost)', data: realWages, borderColor: '#334155', borderWidth: 1, borderDash: [2,2], pointRadius: 0 }
+                    ]
+                },
+                options: options
             });
-            chartMacro = new Chart(document.getElementById('chartMacro'), {
+
+            chartM = new Chart(document.getElementById('chartMacro'), {
                 type: 'line',
-                data: { labels, datasets: [
-                    { label: 'Debito %', data: d, borderColor: '#ffffff', yAxisID: 'y', pointRadius: 0 },
-                    { label: 'Fiducia %', data: sol, backgroundColor: '#10b98110', borderColor: '#10b981', fill: true, yAxisID: 'y1', pointRadius: 0 }
-                ]}, options: { ...common, scales: { y: { ...common.scales.y, suggestedMax: 300 },
-                y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false }, ticks: { color: '#475569' } } } }
+                data: {
+                    labels: ANNI,
+                    datasets: [
+                        { label: 'SIM: Debito/PIL %', data: d, borderColor: '#f8fafc', borderWidth: 2, pointRadius: 0 },
+                        { label: 'REAL: Debito (Ghost)', data: realDebt, borderColor: '#334155', borderWidth: 1, borderDash: [2,2], pointRadius: 0 },
+                        { label: 'SIM: Fiducia %', data: sol, backgroundColor: '#10b98105', borderColor: '#10b981', fill: true, pointRadius: 0 }
+                    ]
+                },
+                options: options
             });
         }
-        document.querySelectorAll('input').forEach(i => i.addEventListener('input', update));
-        document.getElementById('regToggle').addEventListener('change', update);
-        update();
+
+        document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', runSimulation));
+        runSimulation();
     </script>
 </body>
 </html>
