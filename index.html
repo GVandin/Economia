@@ -3,73 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulatore Economico 1992-2026: Stress Test</title>
+    <title>Simulatore Macroeconomico Avanzato 1992-2026</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .slider { @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600; }
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .slider { @apply w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600; }
+        .toggle-checkbox:checked { @apply right-0 border-indigo-600; right: 0; border-color: #4f46e5; }
+        .toggle-checkbox:checked + .toggle-label { @apply bg-indigo-600; background-color: #4f46e5; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="p-4">
 
     <div class="max-w-7xl mx-auto bg-white p-6 rounded-3xl shadow-2xl border border-slate-200">
-        <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6">
+        <header class="mb-6 flex flex-col md:flex-row justify-between items-center border-b pb-4 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">Stress Test <span class="text-indigo-600">Economia Civica</span></h1>
-                <p class="text-slate-500 font-medium italic">Simulazione dinamica della solvibilità e del potere d'acquisto (1992-2026).</p>
+                <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Engine <span class="text-indigo-600">Civic-Economy v3.0</span></h1>
+                <p class="text-slate-500 text-xs font-bold italic text-center md:text-left">Simulazione sistemica: 1992 — 2026</p>
             </div>
-            <div id="status-box" class="bg-slate-900 text-white p-4 rounded-2xl shadow-lg min-w-[240px] text-center border-b-4 border-green-500 transition-all">
-                <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">Rating Solvibilità Mercati</span>
+            <div id="status-box" class="bg-slate-900 text-white p-4 rounded-2xl min-w-[240px] text-center border-b-4 border-green-500 transition-all">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">Solvibilità Internazionale</span>
                 <div id="solvibilita" class="text-3xl font-black text-green-400">100%</div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             
             <!-- CONTROLLI -->
-            <div class="space-y-10 bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner">
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="text-xs font-bold text-slate-600 uppercase italic">Scala Mobile (Protezione %)</label>
-                        <span id="v-scalaMobile" class="text-sm font-black text-indigo-600">0%</span>
+            <div class="space-y-6 bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-inner overflow-y-auto max-h-[75vh]">
+                
+                <!-- Politiche Salariali -->
+                <section class="space-y-4">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase border-b pb-1">Lavoro e Fisco</h3>
+                    <div>
+                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold text-slate-700">Scala Mobile (%)</label><span id="v-sm" class="text-xs font-black text-indigo-600">0%</span></div>
+                        <input type="range" id="sm" min="0" max="100" value="0" class="slider">
                     </div>
-                    <input type="range" id="scalaMobile" min="0" max="100" value="0" class="slider">
-                </div>
-
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="text-xs font-bold text-slate-600 uppercase italic">Ratio Cap (Equità)</label>
-                        <span id="v-ratioCap" class="text-sm font-black text-indigo-600">1:100</span>
+                    <div>
+                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold text-slate-700">Tetto Salariale (Ratio)</label><span id="v-rc" class="text-xs font-black text-indigo-600">1:100</span></div>
+                        <input type="range" id="rc" min="3" max="100" value="100" class="slider">
                     </div>
-                    <input type="range" id="ratioCap" min="3" max="100" value="100" class="slider">
-                </div>
-
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="text-xs font-bold text-slate-600 uppercase italic">Tassa Extraprofitti (%)</label>
-                        <span id="v-tassaExtra" class="text-sm font-black text-indigo-600">15%</span>
+                    <div>
+                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold text-slate-700">Tassa Extraprofitti (%)</label><span id="v-te" class="text-xs font-black text-indigo-600">15%</span></div>
+                        <input type="range" id="te" min="0" max="95" value="15" class="slider">
                     </div>
-                    <input type="range" id="tassaExtra" min="0" max="95" value="15" class="slider">
-                </div>
+                </section>
 
-                <div class="p-4 bg-slate-800 rounded-xl text-[11px] space-y-2 text-slate-300 shadow-lg">
-                    <p class="font-bold text-indigo-400 uppercase border-b border-slate-700 pb-1 mb-2">Dati di scenario:</p>
-                    <p>• La <strong>Scala Mobile</strong> genera inflazione indotta.</p>
-                    <p>• Il <strong>Debito</strong> esplode se l'inflazione non è compensata da tasse.</p>
-                    <p>• La <strong>Solvibilità</strong> crolla se il debito supera il 180% o l'inflazione è fuori controllo.</p>
+                <!-- Demografia e Migrazione -->
+                <section class="space-y-4 pt-2">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase border-b pb-1">Demografia e Flussi</h3>
+                    <div>
+                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold text-slate-700">Flusso Migratorio</label><span id="v-fm" class="text-xs font-black text-indigo-600">Mediocre</span></div>
+                        <input type="range" id="fm" min="0" max="100" value="30" class="slider">
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <label class="text-[11px] font-black text-slate-700 uppercase">Regolarizzazione</label>
+                        <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" id="regToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer outline-none"/>
+                            <label for="regToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1"><label class="text-[11px] font-bold text-slate-700">Calo Demografico</label><span id="v-cd" class="text-xs font-black text-red-600">Lieve</span></div>
+                        <input type="range" id="cd" min="0" max="100" value="20" class="slider">
+                    </div>
+                </section>
+
+                <div class="p-3 bg-slate-800 rounded-xl text-[10px] text-slate-300 leading-tight">
+                    <p><strong>Note Algoritmo:</strong> L'irregolarità alimenta il mercato nero abbassando i salari. La tassazione alta frena l'inflazione ma causa fuga di capitali.</p>
                 </div>
             </div>
 
             <!-- GRAFICI -->
-            <div class="lg:col-span-3 space-y-6">
-                <div class="bg-white p-4 rounded-xl h-80 border border-slate-100 shadow-sm relative">
-                    <h3 class="absolute top-2 left-4 text-[10px] font-bold text-slate-400 uppercase">Valori Nominali: Prezzi vs Salari</h3>
+            <div class="lg:col-span-3 space-y-4">
+                <div class="bg-white p-4 rounded-2xl h-[38vh] border border-slate-100 shadow-sm relative">
                     <canvas id="chartSalari"></canvas>
                 </div>
-
-                <div class="bg-white p-4 rounded-xl h-80 border border-slate-100 shadow-sm relative">
-                    <h3 class="absolute top-2 left-4 text-[10px] font-bold text-slate-400 uppercase">Sostenibilità: Debito vs Fiducia</h3>
+                <div class="bg-white p-4 rounded-2xl h-[38vh] border border-slate-100 shadow-sm relative">
                     <canvas id="chartMacro"></canvas>
                 </div>
             </div>
@@ -79,75 +89,80 @@
     <script>
         let chartSalari, chartMacro;
 
-        const instantOptions = {
+        const opt = {
             animation: { duration: 0 },
             maintainAspectRatio: false,
             plugins: { 
-                legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } },
+                legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } },
                 tooltip: { mode: 'index', intersect: false }
             },
-            scales: { 
-                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                y: { ticks: { font: { size: 10 } } }
-            }
+            scales: { x: { ticks: { font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } }
         };
 
         function update() {
-            const sm = document.getElementById('scalaMobile').value / 100;
-            const rc = document.getElementById('ratioCap').value;
-            const te = document.getElementById('tassaExtra').value / 100;
+            // Input
+            const sm = document.getElementById('sm').value / 100;
+            const rc = document.getElementById('rc').value;
+            const te = document.getElementById('te').value / 100;
+            const fm = document.getElementById('fm').value / 100;
+            const cd = document.getElementById('cd').value / 100;
+            const reg = document.getElementById('regToggle').checked;
 
-            document.getElementById('v-scalaMobile').innerText = (sm * 100).toFixed(0) + "%";
-            document.getElementById('v-ratioCap').innerText = "1:" + rc;
-            document.getElementById('v-tassaExtra').innerText = (te * 100).toFixed(0) + "%";
+            // Display Update
+            document.getElementById('v-sm').innerText = (sm * 100).toFixed(0) + "%";
+            document.getElementById('v-rc').innerText = "1:" + rc;
+            document.getElementById('v-te').innerText = (te * 100).toFixed(0) + "%";
+            document.getElementById('v-fm').innerText = fm > 0.7 ? "Alto" : fm > 0.3 ? "Medio" : "Basso";
+            document.getElementById('v-cd').innerText = cd > 0.7 ? "Critico" : cd > 0.3 ? "Moderato" : "Lieve";
 
             const anni = [];
             for(let i = 1992; i <= 2026; i++) anni.push(i);
 
             let s = [], p = [], d = [], sol = [];
-            let cs = 1000, cp = 1000, cd = 105;
+            let currS = 1000, currP = 1000, currD = 105;
 
             anni.forEach(anno => {
-                s.push(cs.toFixed(0));
-                p.push(cp.toFixed(0));
-                d.push(cd.toFixed(1));
+                s.push(currS.toFixed(0));
+                p.push(currP.toFixed(0));
+                d.push(currD.toFixed(1));
 
-                let inflBase = 0.02;
-                let shockDebito = 0;
-                if (anno >= 2008 && anno <= 2012) { inflBase = 0.035; shockDebito = 4.5; }
-                if (anno >= 2021) { inflBase = 0.08; shockDebito = 2.0; }
-
-                // Retroazione: spirale prezzi-salari più aggressiva
-                let inflIndotta = sm * 0.05; 
-                let inflReale = inflBase + inflIndotta;
-
-                // Solvibilità: riflette il panico dei mercati
-                let currentSolv = 110 - (cd - 100) * 0.8 - (inflReale * 200) - (sm * 10) + (te * 20);
-                currentSolv = Math.min(Math.max(currentSolv, 0), 100);
-                sol.push(currentSolv.toFixed(0));
-
-                cp *= (1 + inflReale);
-                cs *= (1 + (inflReale * sm) + 0.003 + (10/rc * 0.015));
+                // 1. CALCOLO INFLAZIONE
+                let inflBase = (anno >= 2008 && anno <= 2012) ? 0.03 : (anno >= 2021) ? 0.07 : 0.02;
                 
-                // Il debito risente pesantemente dei tassi d'interesse che salgono con l'inflazione
-                cd += shockDebito + (sm * 5) - (te * 8) + (inflReale * 20) - 4; 
+                // Effetti: Scala Mobile (+) | No Tetto Salariale (+) | Tassa Extraprofitti (-)
+                let inflEffettiva = inflBase + (sm * 0.04) + ((rc/100) * 0.015) - (te * 0.02);
+                inflEffettiva = Math.max(inflEffettiva, 0.005); // Minimo tecnico
+
+                // 2. DINAMICA SALARI
+                // Pressione mercato nero: se non regolarizzati, il flusso abbassa i salari
+                let dumpingNero = (!reg) ? (fm * 0.06) : -0.01; // Se reg, il salario sale per emersione
+                // Scarsità forza lavoro: il calo demografico alza i salari per mancanza offerta
+                let effettoScarsita = (cd * 0.03);
+                
+                currS *= (1 + (inflEffettiva * sm) + effettoScarsita - dumpingNero + (8/rc * 0.01));
+
+                // 3. DINAMICA DEBITO E SOLVIBILITA
+                // L'inflazione riduce il valore reale del debito ma distrugge la fiducia
+                let erosioneDebito = (inflEffettiva * 15);
+                let fugaCapitali = (te > 0.4) ? (te * 30) : 0;
+                
+                currD += (sm * 5) - (te * 10) + (inflEffettiva * 12) - erosioneDebito + (cd * 4) - 4;
+                
+                let sVal = 110 - (currD - 110) - (inflEffettiva * 200) - fugaCapitali + (reg ? 10 : -5);
+                sVal = Math.min(Math.max(sVal, 0), 100);
+                sol.push(sVal.toFixed(0));
+
+                currP *= (1 + inflEffettiva);
             });
 
+            // UI Feedback
             const lastSolv = sol[sol.length - 1];
             const sEl = document.getElementById('solvibilita');
             const box = document.getElementById('status-box');
             sEl.innerText = lastSolv + "%";
-            
-            if(lastSolv > 70) { 
-                box.style.borderColor = "#4ade80"; // green-400
-                sEl.style.color = "#4ade80";
-            } else if(lastSolv > 40) { 
-                box.style.borderColor = "#fbbf24"; // amber-400
-                sEl.style.color = "#fbbf24";
-            } else { 
-                box.style.borderColor = "#ef4444"; // red-500
-                sEl.style.color = "#ef4444";
-            }
+            const color = lastSolv > 70 ? "#4ade80" : lastSolv > 40 ? "#fbbf24" : "#f87171";
+            sEl.style.color = color;
+            box.style.borderColor = color;
 
             render(anni, s, p, d, sol);
         }
@@ -161,20 +176,11 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Stipendio Nominale', data: s, borderColor: '#4f46e5', borderWidth: 4, pointRadius: 0 },
-                        { label: 'Costo Vita (Prezzi)', data: p, borderColor: '#ef4444', borderWidth: 2, borderDash: [5, 5], pointRadius: 0 }
+                        { label: 'Salario (Euro)', data: s, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 0 },
+                        { label: 'Costo Vita (Prezzi)', data: p, borderColor: '#ef4444', borderDash: [5,5], pointRadius: 0 }
                     ]
                 },
-                options: { 
-                    ...instantOptions, 
-                    scales: { 
-                        y: { 
-                            min: 800, 
-                            suggestedMax: 12000, // Ampio margine per scenari inflattivi
-                            title: { display: true, text: 'Valore Nominale (Base 1000)', font: { size: 9 } }
-                        } 
-                    } 
-                }
+                options: { ...opt, scales: { y: { suggestedMax: 10000 } } }
             });
 
             chartMacro = new Chart(document.getElementById('chartMacro'), {
@@ -182,34 +188,21 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Debito/PIL (%)', data: d, borderColor: '#0f172a', borderWidth: 3, yAxisID: 'y', pointRadius: 0 },
-                        { label: 'Solvibilità (Fiducia %)', data: sol, backgroundColor: '#10b98115', borderColor: '#10b981', fill: true, yAxisID: 'y1', pointRadius: 0 }
+                        { label: 'Debito/PIL %', data: d, borderColor: '#0f172a', yAxisID: 'y', pointRadius: 0 },
+                        { label: 'Solvibilità %', data: sol, backgroundColor: '#10b98115', borderColor: '#10b981', fill: true, yAxisID: 'y1', pointRadius: 0 }
                     ]
                 },
                 options: { 
-                    ...instantOptions,
-                    scales: {
-                        y: { 
-                            position: 'left', 
-                            min: 80, 
-                            suggestedMax: 350, // Permette di vedere il debito che esplode
-                            title: { display: true, text: 'Percentuale Debito %', font: { size: 9 } } 
-                        },
-                        y1: { 
-                            position: 'right', 
-                            min: 0, 
-                            max: 100, 
-                            grid: { drawOnChartArea: false }, 
-                            title: { display: true, text: 'Fiducia %', font: { size: 9 } } 
-                        }
-                    }
+                    ...opt, 
+                    scales: { 
+                        y: { position: 'left', suggestedMax: 300 }, 
+                        y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false } } 
+                    } 
                 }
             });
         }
 
-        ['scalaMobile', 'ratioCap', 'tassaExtra'].forEach(id => {
-            document.getElementById(id).addEventListener('input', update);
-        });
+        document.querySelectorAll('input').forEach(i => i.addEventListener('input', update));
         update();
     </script>
 </body>
