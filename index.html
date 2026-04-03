@@ -2,14 +2,21 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Sovereign Lab: Open Engine Edition</title>
+    <title>Sovereign Lab: High-Contrast Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #020617; color: #f8fafc; font-family: 'Fira Code', monospace; }
         .slider { @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500; }
         .card { @apply bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-2xl backdrop-blur-md; }
-        .code-input { @apply w-full bg-black/60 border border-slate-700 rounded p-3 text-[11px] text-emerald-400 focus:border-indigo-500 outline-none font-mono mt-1 transition-all; }
+        
+        /* NUOVO STILE AD ALTO CONTRASTO PER LE EQUAZIONI */
+        .code-input { 
+            @apply w-full border border-slate-700 rounded p-3 text-[12px] focus:border-indigo-500 outline-none font-mono mt-1 transition-all;
+            background-color: #000000; /* Fondo Nero Puro */
+            color: #ffffff;            /* Testo Bianco Puro */
+        }
+        
         .label-eq { @apply text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block; }
         .var-tag { @apply px-2 py-0.5 bg-slate-800 rounded text-slate-400 border border-slate-700; }
     </style>
@@ -18,7 +25,6 @@
 
     <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- CONTROLLI E EQUAZIONI -->
         <div class="lg:col-span-4 space-y-4">
             <div class="card border-indigo-500/30">
                 <h2 class="text-lg font-black text-white mb-4 flex items-center gap-2">
@@ -46,9 +52,8 @@
                 </div>
             </div>
 
-            <!-- EDITOR LIVE -->
             <div class="card border-emerald-500/20">
-                <h2 class="text-xs font-black text-emerald-500 mb-4 tracking-widest uppercase italic">// Logic Engine Workspace</h2>
+                <h2 class="text-xs font-black text-emerald-500 mb-4 tracking-widest uppercase italic">// Logic Engine Workspace (High Contrast)</h2>
                 
                 <div class="space-y-4">
                     <div>
@@ -72,14 +77,12 @@
             </div>
         </div>
 
-        <!-- VISUALIZZAZIONE -->
         <div class="lg:col-span-8 space-y-4">
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 <div class="card h-[45vh]"><canvas id="chartWages"></canvas></div>
                 <div class="card h-[45vh]"><canvas id="chartMacro"></canvas></div>
             </div>
             
-            <!-- TOOLTIP VARIABILI -->
             <div class="card bg-black/40 border-slate-800 p-3">
                 <div class="flex flex-wrap gap-3 items-center text-[9px] font-mono uppercase">
                     <span class="text-slate-500 font-black">Docs:</span>
