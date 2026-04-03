@@ -3,74 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulatore Economia Civica 2.0</title>
+    <title>Simulatore Economia Civica - Real Time</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .slider { @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600; }
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     </style>
 </head>
 <body class="p-4 md:p-6">
 
-    <div class="max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-2xl border border-gray-100">
-        <header class="mb-6 border-b pb-4 flex justify-between items-end">
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
+        <header class="mb-6 flex justify-between items-center border-b pb-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight">LABORATORIO <span class="text-indigo-600">AMATO 1992</span></h1>
-                <p class="text-slate-500 italic text-sm">Simulatore di tensione tra diritti sociali e mercati finanziari</p>
+                <h1 class="text-2xl font-black text-slate-800">ANALISI SVALUTAZIONE <span class="text-indigo-600">1992-202X</span></h1>
+                <p class="text-slate-500 text-sm font-medium">Modifica i parametri per osservare la reazione immediata dei mercati e dei salari.</p>
             </div>
-            <div class="text-right">
-                <span class="text-xs font-bold text-slate-400 uppercase">Stato della Solvibilità</span>
-                <div id="solvibilita" class="text-2xl font-black text-green-500">100%</div>
+            <div class="text-right bg-slate-50 p-3 rounded-lg border">
+                <span class="text-[10px] font-bold text-slate-400 uppercase block">Solvibilità Internazionale</span>
+                <div id="solvibilita" class="text-3xl font-black text-green-500 transition-colors">100%</div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- PANEL CONTROLLI (1/4) -->
-            <div class="space-y-8 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-inner">
+            <!-- CONTROLLI -->
+            <div class="space-y-10 bg-slate-50 p-6 rounded-xl shadow-inner">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-3 text-center">Protezione Salariale (Scala Mobile)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-4">Scala Mobile (Protezione %)</label>
                     <input type="range" id="scalaMobile" min="0" max="100" value="0" class="slider">
-                    <div id="v-scalaMobile" class="text-center font-black text-indigo-600 text-xl mt-1">0%</div>
+                    <div id="v-scalaMobile" class="text-xl font-bold text-indigo-700 mt-2 text-center">0%</div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-3 text-center">Equità Interna (Ratio Cap)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-4">Ratio Cap (Equità Aziendale)</label>
                     <input type="range" id="ratioCap" min="5" max="100" value="100" class="slider">
-                    <div id="v-ratioCap" class="text-center font-black text-indigo-600 text-xl mt-1">1:100</div>
+                    <div id="v-ratioCap" class="text-xl font-bold text-indigo-700 mt-2 text-center">1:100</div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-3 text-center">Prelievo Extra-Profitti</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-4">Prelievo Extra-Profitti (%)</label>
                     <input type="range" id="tassaExtra" min="0" max="90" value="20" class="slider">
-                    <div id="v-tassaExtra" class="text-center font-black text-indigo-600 text-xl mt-1">20%</div>
+                    <div id="v-tassaExtra" class="text-xl font-bold text-indigo-700 mt-2 text-center">20%</div>
                 </div>
-
-                <div class="bg-amber-100 p-4 rounded-lg border border-amber-200">
-                    <h4 class="text-xs font-bold text-amber-800 mb-1">Nota didattica:</h4>
-                    <p class="text-[10px] text-amber-900 leading-tight">
-                        Nel 1992 la Scala Mobile fu azzerata. Prova a riportarla al 100% e osserva il grafico del debito pubblico.
-                    </p>
+                
+                <div class="p-3 bg-indigo-100 rounded text-[11px] text-indigo-800 leading-tight border border-indigo-200">
+                    <strong>Tip:</strong> Prova ad alzare la Scala Mobile al 100%. Noterai che la linea dei salari "aggancia" quella dei prezzi, ma la solvibilità crolla a causa del debito.
                 </div>
             </div>
 
-            <!-- PANEL GRAFICI (3/4) -->
+            <!-- GRAFICI -->
             <div class="lg:col-span-3 space-y-6">
-                <!-- Grafico 1: Microeconomia -->
-                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Potere d'Acquisto (Salari vs Inflazione)</h3>
-                    <div class="h-64">
-                        <canvas id="chartSalari"></canvas>
-                    </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm h-72">
+                    <canvas id="chartSalari"></canvas>
                 </div>
 
-                <!-- Grafico 2: Macroeconomia -->
-                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Sostenibilità Finanziaria (Debito vs Solvibilità)</h3>
-                    <div class="h-64">
-                        <canvas id="chartMacro"></canvas>
-                    </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm h-72">
+                    <canvas id="chartMacro"></canvas>
                 </div>
             </div>
         </div>
@@ -79,103 +68,91 @@
     <script>
         let chartSalari, chartMacro;
 
+        // Configurazione comune per rimuovere animazioni e rimbalzi
+        const instantOptions = {
+            animation: { duration: 0 }, // Disattiva animazione iniziale
+            hover: { animationDuration: 0 }, // Disattiva animazione al passaggio mouse
+            responsiveAnimationDuration: 0, // Disattiva animazione al ridimensionamento
+            elements: { line: { tension: 0 } }, // Linee dritte per massima chiarezza
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { font: { size: 11, weight: 'bold' } } } }
+        };
+
         function update() {
-            // Valori Input
             const sm = document.getElementById('scalaMobile').value / 100;
             const rc = document.getElementById('ratioCap').value;
             const te = document.getElementById('tassaExtra').value / 100;
 
-            // Update Labels
             document.getElementById('v-scalaMobile').innerText = (sm * 100).toFixed(0) + "%";
             document.getElementById('v-ratioCap').innerText = "1:" + rc;
             document.getElementById('v-tassaExtra').innerText = (te * 100).toFixed(0) + "%";
 
-            // Parametri Simulazione
             const anni = [0,1,2,3,4,5,6,7,8,9,10];
-            let datiSalari = [];
-            let datiPrezzi = [];
-            let datiDebito = [];
-            let datiSolvibilita = [];
+            let s = [], p = [], d = [], sol = [];
 
-            let currSalario = 1000;
-            let currPrezzo = 1000;
-            let currDebito = 100; // Rapporto Debito/PIL iniziale
-            let inflazione = 0.06; // 6% annuo
+            let cs = 1000, cp = 1000, cd = 100, infl = 0.05;
 
             anni.forEach(a => {
-                datiSalari.push(currSalario.toFixed(0));
-                datiPrezzi.push(currPrezzo.toFixed(0));
+                s.push(cs.toFixed(0));
+                p.push(cp.toFixed(0));
                 
-                // Calcolo Solvibilità: peggiora se il debito sale e se la tassazione è estrema o assente
-                let solv = 100 - (currDebito - 100) - (Math.abs(0.4 - te) * 50);
-                solv = Math.min(Math.max(solv, 0), 100);
-                datiSolvibilita.push(solv.toFixed(0));
-                datiDebito.push(currDebito.toFixed(1));
+                let currentSolv = 100 - (cd - 100) * 1.5 - (sm * 20);
+                currentSolv = Math.min(Math.max(currentSolv, 0), 100);
+                sol.push(currentSolv.toFixed(0));
+                d.push(cd.toFixed(1));
 
-                // Logica evolutiva
-                currPrezzo *= (1 + inflazione);
-                
-                // Il salario cresce per scala mobile + pressione equità (ratioCap basso spinge salari su)
-                let spintaEquita = (100/rc) * 0.02;
-                currSalario *= (1 + (inflazione * sm) + spintaEquita);
-
-                // Il debito sale se paghiamo molta scala mobile (spesa pubblica/pressione) 
-                // e scende se tassiamo extraprofitti
-                currDebito += (sm * 5) - (te * 8) + (inflazione * 2);
+                cp *= (1 + infl);
+                cs *= (1 + (infl * sm) + (10/rc * 0.01));
+                cd += (sm * 4) - (te * 6) + (infl * 3);
             });
 
-            // UI Solvibilità Flash
-            const lastSolv = datiSolvibilita[datiSolvibilita.length - 1];
+            const lastSolv = sol[sol.length - 1];
             const sEl = document.getElementById('solvibilita');
             sEl.innerText = lastSolv + "%";
-            sEl.className = `text-2xl font-black ${lastSolv > 70 ? 'text-green-500' : lastSolv > 40 ? 'text-amber-500' : 'text-red-600'}`;
+            sEl.className = `text-3xl font-black ${lastSolv > 70 ? 'text-green-500' : lastSolv > 40 ? 'text-amber-500' : 'text-red-600'}`;
 
-            renderCharts(anni, datiSalari, datiPrezzi, datiDebito, datiSolvibilita);
+            render(anni, s, p, d, sol);
         }
 
-        function renderCharts(labels, s, p, d, sol) {
+        function render(labels, s, p, d, sol) {
             if(chartSalari) chartSalari.destroy();
             if(chartMacro) chartMacro.destroy();
 
-            // Chart 1: Salari e Prezzi
             chartSalari = new Chart(document.getElementById('chartSalari'), {
                 type: 'line',
                 data: {
-                    labels: labels.map(l => "Anno " + l),
+                    labels: labels.map(l => "T+" + l),
                     datasets: [
-                        { label: 'Salario Reale', data: s, borderColor: '#4f46e5', backgroundColor: '#4f46e522', fill: true, tension: 0.3 },
-                        { label: 'Costo Vita (Inflazione)', data: p, borderColor: '#ef4444', borderDash: [5, 5], tension: 0.3 }
+                        { label: 'Salario (Potere d\'acquisto)', data: s, borderColor: '#4f46e5', borderWidth: 3, pointRadius: 0 },
+                        { label: 'Inflazione (Prezzi)', data: p, borderColor: '#ef4444', borderDash: [4, 4], pointRadius: 0 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { ...instantOptions, scales: { y: { min: 900, max: 2500 } } }
             });
 
-            // Chart 2: Debito e Solvibilità
             chartMacro = new Chart(document.getElementById('chartMacro'), {
                 type: 'line',
                 data: {
-                    labels: labels.map(l => "Anno " + l),
+                    labels: labels.map(l => "T+" + l),
                     datasets: [
-                        { label: 'Rapporto Debito/PIL (%)', data: d, borderColor: '#1e293b', yAxisID: 'y' },
-                        { label: 'Fiducia Mercati (Solvibilità)', data: sol, borderColor: '#10b981', backgroundColor: '#10b98122', fill: true, yAxisID: 'y1' }
+                        { label: 'Debito/PIL %', data: d, borderColor: '#1e293b', yAxisID: 'y', borderWidth: 3, pointRadius: 0 },
+                        { label: 'Solvibilità %', data: sol, borderColor: '#10b981', backgroundColor: '#10b98115', fill: true, yAxisID: 'y1', pointRadius: 0 }
                     ]
                 },
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
+                    ...instantOptions,
                     scales: {
-                        y: { type: 'linear', position: 'left', title: { display: true, text: 'Debito' } },
-                        y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Solvibilità %' }, min: 0, max: 100 }
+                        y: { position: 'left', min: 80, max: 200, title: { display: true, text: 'Debito %' } },
+                        y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false }, title: { display: true, text: 'Fiducia %' } }
                     }
                 }
             });
         }
 
-        // Listener e Init
         ['scalaMobile', 'ratioCap', 'tassaExtra'].forEach(id => {
             document.getElementById(id).addEventListener('input', update);
         });
         update();
     </script>
 </body>
-</html>
+</html>    
