@@ -2,107 +2,130 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Sovereign Lab: Dual Benchmark Edition</title>
+    <title>Sovereign Lab: Pro Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #020617; color: #f8fafc; font-family: 'Fira Code', monospace; }
-        .slider { @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500; }
-        .card { @apply bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-2xl backdrop-blur-md; }
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap');
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        
+        .slider { @apply w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer outline-none transition-all; }
+        .slider::-webkit-slider-thumb { @apply appearance-none w-4 h-4 rounded-full bg-indigo-500 hover:bg-indigo-400 cursor-pointer; }
+        
+        .panel { @apply bg-[#0f172a] border border-slate-800/80 rounded-xl p-5 shadow-2xl; }
+        
+        /* I box delle equazioni ad altissimo contrasto come richiesto */
         .code-input { 
-            @apply w-full border border-slate-700 rounded p-3 text-[12px] focus:border-indigo-500 outline-none font-mono mt-1 transition-all;
+            @apply w-full border border-slate-700 rounded-md p-3 text-[12px] font-mono transition-all outline-none;
             background-color: #000000; 
             color: #ffffff; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
-        .label-eq { @apply text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block; }
-        .var-tag { @apply px-2 py-0.5 bg-slate-800 rounded text-slate-400 border border-slate-700; }
+        .code-input:focus { @apply border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]; }
+        .code-input.error { @apply border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]; }
+        
+        .badge { @apply px-2 py-1 bg-slate-800 text-slate-300 rounded text-[10px] font-mono border border-slate-700; }
+        .step-num { @apply inline-flex items-center justify-center w-5 h-5 rounded bg-slate-800 text-[10px] font-black mr-2 border border-slate-700; }
     </style>
 </head>
-<body class="p-4 lg:p-8">
+<body class="p-4 lg:p-6 min-h-screen flex flex-col">
 
-    <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- HEADER -->
+    <header class="mb-6 flex justify-between items-end border-b border-slate-800 pb-4">
+        <div>
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 tracking-tight">SOVEREIGN LAB</h1>
+            <p class="text-xs text-slate-500 font-mono mt-1">v3.0 // Dynamic Equation Context Engine</p>
+        </div>
+        <div id="status-led" class="text-xs font-mono font-bold px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> SYSTEM ONLINE
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
-        <!-- INPUT & EQUATIONS -->
-        <div class="lg:col-span-4 space-y-4">
-            <div class="card border-indigo-500/30">
-                <h2 class="text-lg font-black text-white mb-4 italic tracking-tighter">CONTROLLI POLITICI</h2>
-                <div class="space-y-5">
+        <!-- COLONNA 1: CONTROLLI (3/12) -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+            <div class="panel border-t-2 border-t-indigo-500">
+                <h2 class="text-sm font-black mb-5 text-slate-200 tracking-wider">INPUT POLITICI</h2>
+                <div class="space-y-6">
                     <div>
-                        <div class="flex justify-between"><label class="label-eq text-slate-300">Scala Mobile (sm)</label><span id="v-sm" class="text-xs font-bold text-indigo-400">0%</span></div>
-                        <input type="range" id="sm" min="0" max="100" value="0" class="slider">
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Scala Mobile (sm)</label><span id="v-sm" class="text-xs font-black text-indigo-400 font-mono">0%</span></div>
+                        <input type="range" id="sm" min="0" max="100" value="0" class="slider" style="accent-color: #6366f1;">
                     </div>
                     <div>
-                        <div class="flex justify-between"><label class="label-eq text-slate-300">Extraprofitti (te)</label><span id="v-te" class="text-xs font-bold text-red-400">15%</span></div>
-                        <input type="range" id="te" min="0" max="95" value="15" class="slider">
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Extraprofitti (te)</label><span id="v-te" class="text-xs font-black text-red-400 font-mono">15%</span></div>
+                        <input type="range" id="te" min="0" max="95" value="15" class="slider" style="accent-color: #f87171;">
                     </div>
                     <div>
-                        <div class="flex justify-between"><label class="label-eq text-slate-300">Flusso Migratorio (fm)</label><span id="v-fm" class="text-xs font-bold text-emerald-400">0.35</span></div>
-                        <input type="range" id="fm" min="0" max="100" value="35" class="slider">
+                        <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">Migrazione (fm)</label><span id="v-fm" class="text-xs font-black text-emerald-400 font-mono">0.35</span></div>
+                        <input type="range" id="fm" min="0" max="100" value="35" class="slider" style="accent-color: #34d399;">
                     </div>
-                    <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                        <label class="label-eq text-slate-300 m-0">Regolarizzazione (reg)</label>
-                        <input type="checkbox" id="regToggle" class="w-5 h-5 accent-emerald-500 cursor-pointer">
+                    <div class="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800">
+                        <label class="text-xs font-bold text-slate-400">Regolarizzazione (reg)</label>
+                        <input type="checkbox" id="regToggle" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
                     </div>
                 </div>
             </div>
 
-            <div class="card border-emerald-500/20">
-                <h2 class="text-xs font-black text-emerald-500 mb-4 tracking-widest uppercase italic">// Engine Live (Edit values below)</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="label-eq">Variazione Salariale (deltaW)</label>
-                        <textarea id="eq-wage" class="code-input" rows="2">(infl * sm) + (gap * 0.18) + 0.002</textarea>
-                    </div>
-                    <div>
-                        <label class="label-eq">Inflazione Effettiva (infl)</label>
-                        <textarea id="eq-infl" class="code-input" rows="2">inflBase + (sm * 0.05) - (te * 0.01)</textarea>
-                    </div>
-                    <div>
-                        <label class="label-eq">Calo Demografico (demo)</label>
-                        <textarea id="eq-demo" class="code-input" rows="2">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0)</textarea>
-                    </div>
-                    <div>
-                        <label class="label-eq">Incremento Debito (deltaD)</label>
-                        <textarea id="eq-debt" class="code-input" rows="3">(sm * 5) + (demo * 180) - (reg ? fm * 12 : 0) + (fuga * 35) - (te * 8) - 1.5</textarea>
-                    </div>
-                    <div>
-                        <label class="label-eq text-orange-400">Logica Fuga Capitali (fuga)</label>
-                        <textarea id="eq-fuga" class="code-input" rows="1">(te > 0.45) ? (te - 0.45) * 6 : 0</textarea>
-                    </div>
-                    <div>
-                        <label class="label-eq text-purple-400">Efficacia Migratoria (eff)</label>
-                        <textarea id="eq-eff" class="code-input" rows="1">reg ? 0.95 : 0.35</textarea>
-                    </div>
+            <div class="panel flex-grow">
+                <h2 class="text-xs font-black mb-3 text-slate-500 tracking-wider">DICTIONARY</h2>
+                <div class="flex flex-wrap gap-2">
+                    <span class="badge"><span class="text-blue-400">potere</span> = currS/currP</span>
+                    <span class="badge"><span class="text-blue-400">inflBase</span> = 0.018/0.08</span>
+                    <span class="badge">sm, te, fm</span>
+                    <span class="badge">reg (1 o 0)</span>
+                    <span class="badge">currS, currP, currD</span>
                 </div>
-                <div id="error-log" class="text-[10px] text-red-400 mt-3 font-bold"></div>
+                <div id="error-log" class="mt-4 text-[11px] text-red-400 font-mono font-bold leading-tight"></div>
             </div>
         </div>
 
-        <!-- CHARTS -->
-        <div class="lg:col-span-8 space-y-4">
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <div class="card h-[45vh] relative">
-                    <div class="absolute top-2 left-4 flex gap-4 text-[9px]">
-                        <span class="text-blue-400">● SIM Salari</span>
-                        <span class="text-red-400">-- SIM Prezzi</span>
-                        <span class="text-slate-500">-- REAL Salari</span>
-                        <span class="text-slate-500">─ REAL Prezzi</span>
-                    </div>
-                    <canvas id="chartWages" class="mt-4"></canvas>
-                </div>
-                <div class="card h-[45vh] relative">
-                    <div class="absolute top-2 left-4 flex gap-4 text-[9px]">
-                        <span class="text-white">● SIM Debito</span>
-                        <span class="text-slate-500">-- REAL Debito</span>
-                    </div>
-                    <canvas id="chartMacro" class="mt-4"></canvas>
-                </div>
+        <!-- COLONNA 2: TERMINALE LOGICO (4/12) -->
+        <div class="lg:col-span-4 panel border-t-2 border-t-emerald-500 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-black text-slate-200 tracking-wider">LOGIC ENGINE</h2>
+                <span class="text-[9px] text-emerald-500 font-mono uppercase border border-emerald-500/30 px-2 py-0.5 rounded">Execution Order: Top to Bottom</span>
             </div>
             
-            <div class="card bg-black/40 border-slate-800 p-3 flex flex-wrap gap-3 items-center text-[9px] font-mono">
-                <span class="text-slate-500 font-black uppercase">Legend:</span>
-                <span class="var-tag"><b>Grigio Continuo</b> = Inflazione Storica</span>
-                <span class="var-tag"><b>Grigio Tratteggiato</b> = Salari Storici</span>
+            <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                <div>
+                    <label class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-pink-400">1</span> Calo Demografico (demo)</label>
+                    <textarea id="eq-demo" class="code-input" rows="1">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0)</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2</span> Fuga Capitali (fuga)</label>
+                    <textarea id="eq-fuga" class="code-input" rows="1">(te > 0.45) ? (te - 0.45) * 6 : 0</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-emerald-400">3</span> Gap Manodopera (gap)</label>
+                    <textarea id="eq-gap" class="code-input" rows="1">demo - (fm * (reg ? 0.95 : 0.35))</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-red-400">4</span> Inflazione (infl)</label>
+                    <textarea id="eq-infl" class="code-input" rows="1">inflBase + (sm * 0.05) - (te * 0.01)</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-blue-400">5</span> Variazione Salari (deltaW)</label>
+                    <textarea id="eq-wage" class="code-input" rows="1">(infl * sm) + (gap * 0.18) + 0.002</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-white uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-white">6</span> Incremento Debito (deltaD)</label>
+                    <textarea id="eq-debt" class="code-input" rows="2">(sm * 5) + (demo * 180) - (reg ? fm * 12 : 0) + (fuga * 35) - (te * 8) - 1.5</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLONNA 3: MONITORAGGIO (5/12) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="panel flex-grow relative pb-8">
+                <h3 class="absolute top-4 right-5 text-[10px] font-bold text-slate-500 font-mono uppercase">Salari vs Prezzi</h3>
+                <canvas id="chartWages"></canvas>
+            </div>
+            <div class="panel flex-grow relative pb-8">
+                <h3 class="absolute top-4 right-5 text-[10px] font-bold text-slate-500 font-mono uppercase">Debito Macro</h3>
+                <canvas id="chartMacro"></canvas>
             </div>
         </div>
     </div>
@@ -110,111 +133,127 @@
     <script>
         let chartW, chartM;
         const ANNI = Array.from({length: 35}, (_, i) => 1992 + i);
-
-        // DATA BENCHMARKS (GHOST LINES)
-        const realWages = ANNI.map((a, i) => 1000 * Math.pow(1.004, i)); // 0.4% crescita reale annua (media ITA)
         
-        // Calcolo inflazione storica approssimata (Prezzi)
-        let pBase = 1000;
-        const realPrices = ANNI.map((anno) => {
-            let rate = (anno > 2021) ? 0.07 : (anno > 2000) ? 0.018 : 0.04;
-            pBase *= (1 + rate);
-            return pBase;
-        });
-
+        // Ghost Lines (Benchmark)
+        const realWages = ANNI.map((a, i) => 1000 * Math.pow(1.004, i));
+        let pB = 1000;
+        const realPrices = ANNI.map(a => { pB *= (1 + (a > 2021 ? 0.07 : a > 2000 ? 0.018 : 0.04)); return pB; });
         const realDebt = ANNI.map((a, i) => 105 + (i * 1.65) + (a > 2020 ? 18 : 0));
 
+        // Motore di valutazione sicuro
+        function evaluateExpression(expr, context) {
+            const keys = Object.keys(context);
+            const values = Object.values(context);
+            const func = new Function(...keys, `return (${expr});`);
+            return func(...values);
+        }
+
+        function setStatus(isError, msg = "") {
+            const led = document.getElementById('status-led');
+            const log = document.getElementById('error-log');
+            document.querySelectorAll('.code-input').forEach(el => el.classList.remove('error'));
+            
+            if (isError) {
+                led.className = "text-xs font-mono font-bold px-3 py-1 rounded bg-red-500/10 text-red-500 border border-red-500/50 flex items-center gap-2";
+                led.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> ERROR`;
+                log.innerText = `🚨 ${msg}`;
+            } else {
+                led.className = "text-xs font-mono font-bold px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-2";
+                led.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE`;
+                log.innerText = "";
+            }
+        }
+
         function simulate() {
+            // Lettura Inputs
             const sm = document.getElementById('sm').value / 100;
             const te = document.getElementById('te').value / 100;
             const fm = document.getElementById('fm').value / 100;
-            const reg = document.getElementById('regToggle').checked;
+            const reg = document.getElementById('regToggle').checked ? 1 : 0;
 
+            // Update UI Labels
             document.getElementById('v-sm').innerText = (sm * 100).toFixed(0) + "%";
             document.getElementById('v-te').innerText = (te * 100).toFixed(0) + "%";
             document.getElementById('v-fm').innerText = fm.toFixed(2);
 
-            const eqWageStr = document.getElementById('eq-wage').value;
-            const eqInflStr = document.getElementById('eq-infl').value;
-            const eqDebtStr = document.getElementById('eq-debt').value;
-            const eqDemoStr = document.getElementById('eq-demo').value;
-
-            let s = [], p = [], d = [], sol = [];
+            let s = [], p = [], d = [];
             let currS = 1000, currP = 1000, currD = 105;
-            const errLog = document.getElementById('error-log');
-            errLog.innerText = "";
+            let currentEqId = "";
 
             try {
                 ANNI.forEach((anno) => {
-                    s.push(currS);
-                    p.push(currP);
-                    d.push(currD);
-                    sol.push(Math.max(0, 100 - (currD - 110) * 0.8));
+                    // Contesto Base Globale per questo anno
+                    let ctx = { anno, sm, te, fm, reg, currS, currP, currD };
+                    ctx.inflBase = (anno > 2021) ? 0.08 : 0.018;
+                    ctx.potere = currS / currP;
 
-                    let inflBase = (anno > 2021) ? 0.08 : (anno > 2008 && anno < 2012) ? 0.03 : 0.018;
-                    let potere = currS / currP;
-                    let fuga = (te > 0.45) ? (te - 0.45) * 6 : 0;
+                    // Esecuzione a Cascata: ogni passo arricchisce il contesto (ctx)
+                    currentEqId = 'eq-demo'; ctx.demo = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-fuga'; ctx.fuga = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-gap';  ctx.gap  = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-infl'; ctx.infl = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-wage'; ctx.deltaW = evaluateExpression(document.getElementById(currentEqId).value, ctx);
+                    currentEqId = 'eq-debt'; ctx.deltaD = evaluateExpression(document.getElementById(currentEqId).value, ctx);
 
-                    let demo = new Function('potere', 'inflBase', 'sm', 'te', 'fm', 'reg', `return ${eqDemoStr}`)(potere, inflBase, sm, te, fm, reg);
-                    let infl = new Function('inflBase', 'sm', 'te', 'fm', 'reg', `return ${eqInflStr}`)(inflBase, sm, te, fm, reg);
-                    let gap = demo - (fm * (reg ? 0.95 : 0.35));
-                    let deltaW = new Function('infl', 'sm', 'gap', 'te', 'potere', `return ${eqWageStr}`)(infl, sm, gap, te, potere);
-                    let deltaD = new Function('sm', 'demo', 'reg', 'fm', 'fuga', 'te', `return ${eqDebtStr}`)(sm, demo, reg, fm, fuga, te);
+                    // Salvataggio Dati
+                    s.push(currS); p.push(currP); d.push(currD);
 
-                    currS *= (1 + deltaW);
-                    currP *= (1 + infl);
-                    currD += deltaD;
+                    // Aggiornamento Stato Reale
+                    currS *= (1 + ctx.deltaW);
+                    currP *= (1 + ctx.infl);
+                    currD += ctx.deltaD;
                 });
-                render(s, p, d, sol);
+                
+                setStatus(false);
+                render(s, p, d);
+
             } catch (e) {
-                errLog.innerText = "🚨 Errore: " + e.message;
+                setStatus(true, `Syntax Error at [${currentEqId.replace('eq-','').toUpperCase()}]:\n${e.message}`);
+                document.getElementById(currentEqId).classList.add('error');
             }
         }
 
-        function render(s, p, d, sol) {
-            if(chartW) chartW.destroy();
-            if(chartM) chartM.destroy();
-
-            const cfg = {
-                maintainAspectRatio: false,
-                animation: false,
-                plugins: { legend: { display: false } },
+        // Configurazione Globale Grafici
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        
+        function render(s, p, d) {
+            if(chartW) chartW.destroy(); if(chartM) chartM.destroy();
+            
+            const gridOpts = { color: '#1e293b', drawBorder: false };
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
                 scales: { 
-                    x: { ticks: { color: '#475569', font: { size: 9 } }, grid: { display: false } }, 
-                    y: { ticks: { color: '#475569', font: { size: 9 } }, grid: { color: '#1e293b' } } 
+                    x: { grid: { display: false } }, 
+                    y: { grid: gridOpts } 
                 }
             };
 
             chartW = new Chart(document.getElementById('chartWages'), {
                 type: 'line',
-                data: {
-                    labels: ANNI,
-                    datasets: [
-                        { label: 'SIM: SALARI', data: s, borderColor: '#6366f1', borderWidth: 2.5, pointRadius: 0 },
-                        { label: 'SIM: PREZZI', data: p, borderColor: '#f43f5e', borderWidth: 2, borderDash: [4,4], pointRadius: 0 },
-                        { label: 'REAL: PREZZI (Ghost)', data: realPrices, borderColor: '#475569', borderWidth: 1, pointRadius: 0 },
-                        { label: 'REAL: SALARI (Ghost)', data: realWages, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], pointRadius: 0 }
-                    ]
-                },
-                options: cfg
+                data: { labels: ANNI, datasets: [
+                    { label: 'SIM Salari', data: s, borderColor: '#6366f1', borderWidth: 2, tension: 0.2, pointRadius: 0 },
+                    { label: 'SIM Prezzi', data: p, borderColor: '#f43f5e', borderWidth: 2, borderDash: [4,4], tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Prezzi', data: realPrices, borderColor: '#475569', borderWidth: 1, tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Salari', data: realWages, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], tension: 0.2, pointRadius: 0 }
+                ]}, options: commonOptions
             });
 
             chartM = new Chart(document.getElementById('chartMacro'), {
                 type: 'line',
-                data: {
-                    labels: ANNI,
-                    datasets: [
-                        { label: 'SIM: DEBITO', data: d, borderColor: '#f8fafc', borderWidth: 2, pointRadius: 0 },
-                        { label: 'REAL: DEBITO (Ghost)', data: realDebt, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], pointRadius: 0 },
-                        { label: 'FIDUCIA', data: sol, backgroundColor: '#10b98105', borderColor: '#10b981', fill: true, pointRadius: 0 }
-                    ]
-                },
-                options: cfg
+                data: { labels: ANNI, datasets: [
+                    { label: 'SIM Debito', data: d, borderColor: '#f8fafc', borderWidth: 2, tension: 0.2, pointRadius: 0 },
+                    { label: 'REAL Debito', data: realDebt, borderColor: '#475569', borderWidth: 1, borderDash: [3,3], tension: 0.2, pointRadius: 0 }
+                ]}, options: commonOptions
             });
         }
 
+        // Listeners
         document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', simulate));
-        simulate();
+        window.addEventListener('resize', simulate); // Redraw su resize per responsività
+        simulate(); // Avvio Iniziale
     </script>
 </body>
 </html>
