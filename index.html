@@ -91,23 +91,23 @@
             
             <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
                 <div>
-                    <label class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-pink-400">1</span> Calo Demografico (demo)</label>
+                    <label class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-pink-400">1 - </span> Calo Demografico (demo)</label>
                     <textarea id="eq-demo" class="code-input" rows="1">0.018 + (potere < 0.95 ? (0.95 - potere) * 0.5 : 0)</textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2</span> Fuga Capitali (fuga)</label>
+                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-orange-400">2 - </span> Fuga Capitali (fuga)</label>
                     <textarea id="eq-fuga" class="code-input" rows="1">(te > 0.45) ? (te - 0.45) * 6 : 0</textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-emerald-400">3</span> Gap Manodopera (gap)</label>
+                    <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-emerald-400">3 - </span> Gap Manodopera (gap)</label>
                     <textarea id="eq-gap" class="code-input" rows="1">demo - (fm * (reg ? 0.95 : 0.35))</textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-red-400">4</span> Inflazione (infl)</label>
+                    <label class="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-red-400">4 - </span> Inflazione (infl)</label>
                     <textarea id="eq-infl" class="code-input" rows="1">inflBase + (sm * 0.05) - (te * 0.01)</textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-blue-400">5</span> Variazione Salari (deltaW)</label>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center"><span class="step-num text-blue-400">5 - </span> Variazione Salari (deltaW)</label>
                     <textarea id="eq-wage" class="code-input" rows="1">(infl * sm) + (gap * 0.18) + 0.002</textarea>
                 </div>
                 <div>
